@@ -1,0 +1,129 @@
+QUICK START GUIDE - Predictive Pulse v2.0
+=========================================
+
+## Installation (One-time setup)
+
+1. Install dependencies:
+   pip install -r requirements.txt
+
+2. Run the application:
+   python app.py
+
+3. Open your browser:
+   http://localhost:10000
+
+## First Time Use
+
+1. Click "Register" to create a new account
+   - Username: Choose any username
+   - Email: Your email address
+   - Password: At least 6 characters
+
+2. Click "Login" and enter your credentials
+
+3. You're now logged in! You can:
+   - Make predictions (Predict button)
+   - View your history (Dashboard button)
+   - Logout when done
+
+## Making a Prediction
+
+1. Click "Predict"
+2. Fill out the 4-section form:
+   - Section 1: Personal Information (Age, Gender)
+   - Section 2: Medical History (Hypertension history, Medication, etc.)
+   - Section 3: Symptoms & Severity (Shortness of breath, Vision changes, etc.)
+   - Section 4: Blood Pressure & Optional Metrics (Systolic, Diastolic, Height, Weight)
+3. Click "Get Prediction"
+
+## Understanding Your Results
+
+- **Blood Pressure Stage**: Color-coded (Green=Normal, Orange=Stage-1, Red=Stage-2, Dark Red=Crisis)
+- **Confidence Score**: How sure the model is (0-100%)
+- **Risk Score**: Your overall health risk (0-100)
+- **Recommendations**: Personalized health advice based on severity
+
+## Dashboard Features
+
+- View all your predictions
+- See trends over time
+- Click "View" for detailed information
+- Click "PDF" to download report
+- Click "Delete" to remove prediction
+
+## PDF Export
+
+- Export any prediction as a professional PDF report
+- Share with your doctor
+- Includes all health data and recommendations
+
+## Mobile Support
+
+- App works on phones, tablets, and desktops
+- All features available on mobile
+- Touch-friendly interface
+
+## Important Notes
+
+- Height/Weight/Heart Rate are optional
+- Data is securely stored in database
+- Only you can see your predictions
+- Predictions are only suggestions - consult a doctor for medical advice
+
+## Troubleshooting
+
+Database not created?
+  - Delete predictive_pulse.db
+  - Restart app
+
+Can't login after registering?
+  - Make sure password matches
+  - Check email for typos
+
+Pages showing errors?
+  - Make sure all .html files are in templates/ folder
+  - Restart the app
+
+Model loading error?
+  - Ensure model.joblib is in project root
+  - Check file is not corrupted
+
+## New Features (v2.0)
+
+✅ User authentication (Login/Register)
+✅ Prediction history & dashboard
+✅ Confidence scores for predictions
+✅ Risk assessment (0-100 score)
+✅ PDF export of reports
+✅ BMI calculation
+✅ Optional health metrics (weight, height, heart rate)
+✅ Better mobile responsive design
+✅ Comprehensive error handling
+✅ Colorized risk indicators
+
+## File Structure
+
+app.py - Main application
+models.py - Database models
+forms.py - Web forms
+utils.py - Helper functions (PDF, risk calc, etc.)
+config.py - Configuration
+predictive_pulse.db - Database (auto-created)
+requirements.txt - Dependencies
+
+templates/ - HTML files
+  - home.html
+  - login.html (NEW)
+  - register.html (NEW)
+  - predict.html (UPDATED)
+  - dashboard.html (NEW)
+  - prediction_detail.html (NEW)
+  - error.html (NEW)
+  - layout.html (UPDATED)
+
+## Support
+
+For detailed setup guide, see SETUP.md
+For more information, check README.md
+
+Happy predicting!

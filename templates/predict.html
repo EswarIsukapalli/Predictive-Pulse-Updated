@@ -225,6 +225,26 @@
                             {% endfor %}
                         {% endif %}
                     </div>
+
+                    <div class="form-group">
+                        <label class="form-label">{{ form.Height.label }}</label>
+                        {{ form.Height(class="form-input", placeholder="e.g., 170 cm (optional)") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">{{ form.Weight.label }}</label>
+                        {{ form.Weight(class="form-input", placeholder="e.g., 70 kg (optional)") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">{{ form.HeartRate.label }}</label>
+                        {{ form.HeartRate(class="form-input", placeholder="e.g., 72 bpm (optional)") }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">{{ form.Notes.label }}</label>
+                    {{ form.Notes(class="form-textarea", placeholder="Add any additional notes", rows=3) }}
                 </div>
                 
                 <div class="section-navigation">
@@ -248,10 +268,36 @@
                 <div class="result-icon">📊</div>
             </div>
             <div class="result-content">
-                <p class="result-text">{{ output }}</p>
+                <p class="result-text">{{ output }} <span class="stage-badge {{ stage_class }}">{{ stage_label }}</span></p>
+                
+                <!-- Confidence & Risk Scores -->
+                <div class="scores-container">
+                    <div class="score-box">
+                        <div class="score-label">Confidence</div>
+                        <div class="score-value">{{ confidence_score }}%</div>
+                        <div class="score-bar"><div class="score-fill" style="width: {{ confidence_score }}%"></div></div>
+                    </div>
+                    <div class="score-box">
+                        <div class="score-label">Risk Score</div>
+                        <div class="score-value">{{ risk_score }}/100</div>
+                        <div class="score-bar"><div class="score-fill risk" style="width: {{ risk_score }}%"></div></div>
+                    </div>
+                </div>
+                
+                {% if recommendations %}
+                <div class="recommendations-section">
+                    <h4 class="recommendations-title">📋 Recommendations:</h4>
+                    <ul class="recommendations-list">
+                        {% for recommendation in recommendations %}
+                        <li class="recommendation-item">{{ recommendation }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
             </div>
             <div class="result-actions">
-                <a href="{{ url_for('home') }}" class="btn-home">← Back to Home</a>
+                <a href="{{ url_for('dashboard') }}" class="btn-dashboard">📊 Dashboard</a>
+                <a href="{{ url_for('home') }}" class="btn-home">← Home</a>
                 <button class="btn-new-prediction" onclick="resetForm()">New Prediction</button>
             </div>
         </div>
@@ -516,6 +562,84 @@
     color: #ffffff;
 }
 
+.recommendations-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.recommendations-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 1rem 0;
+}
+
+.recommendations-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recommendation-item {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+    background-color: #f0f8ff;
+    border-left: 3px solid #4CAF50;
+    border-radius: 4px;
+    color: #2c3e50;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.recommendation-item:before {
+    content: "✓ ";
+    color: #4CAF50;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.stage-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stage-normal {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.stage-1 {
+    background-color: #FF9800;
+    color: white;
+}
+
+.stage-2 {
+    background-color: #FF6B47;
+    color: white;
+}
+
+.stage-crisis {
+    background-color: #E53935;
+    color: white;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(229, 57, 53, 0);
+    }
+}
+
 .result-actions {
     display: flex;
     gap: 1rem;
@@ -552,6 +676,96 @@
 .btn-new-prediction:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-dashboard {
+    background: linear-gradient(45deg, #27ae60, #229954);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-dashboard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+}
+
+.scores-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.score-box {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.score-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.score-value {
+    color: #4CAF50;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.score-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.score-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    width: 75%;
+    transition: width 0.5s ease;
+}
+
+.score-fill.risk {
+    background: linear-gradient(90deg, #FF9800, #E53935);
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.form-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
 }
 
 @media (max-width: 768px) {

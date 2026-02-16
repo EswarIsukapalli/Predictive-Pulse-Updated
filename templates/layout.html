@@ -29,6 +29,7 @@
 
         .header {
             background: rgba(0, 0, 0, 0.95);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: sticky;
@@ -241,7 +242,14 @@
             <nav>
                 <ul class="nav-links">
                     <li><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('predict') }}">Predict</a></li>
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('predict') }}">Predict</a></li>
+                        <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                        <li><a href="{{ url_for('logout') }}">Logout ({{ current_user.username }})</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                        <li><a href="{{ url_for('register') }}">Register</a></li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>

@@ -3,5 +3,11 @@ scikit-learn == 1.5.2
 feature-engine
 flask
 flask-wtf
+flask-sqlalchemy
+flask-login
+flask-migrate
 gunicorn
-joblib==1.4.0 
+joblib==1.4.0
+reportlab
+werkzeug
+email-validator 

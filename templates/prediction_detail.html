@@ -1,0 +1,530 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="prediction-detail-container">
+    <div class="detail-header">
+        <a href="{{ url_for('dashboard') }}" class="btn-back">← Back to Dashboard</a>
+        <h1>Prediction Details</h1>
+        <div class="detail-actions">
+            <a href="{{ url_for('export_pdf', pred_id=prediction.id) }}" class="btn-export">Download PDF</a>
+        </div>
+    </div>
+
+    <!-- Stage Result -->
+    <div class="detail-card result-card">
+        <h2>Diagnosis Result</h2>
+        <div class="stage-large {{ prediction.stage_class }}">
+            {{ prediction.stage_label }}
+        </div>
+        <div class="result-meta">
+            <div class="meta-item">
+                <span class="meta-label">Severity:</span>
+                <span class="meta-value">{{ prediction.severity }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Confidence:</span>
+                <span class="meta-value">{{ prediction.confidence_score }}%</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Recorded:</span>
+                <span class="meta-value">{{ prediction.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Assessment -->
+    <div class="detail-card risk-card">
+        <h2>Risk Assessment</h2>
+        <div class="risk-score-display">
+            <div class="risk-circle" data-risk="{{ prediction.risk_score }}">
+                <span class="risk-number">{{ prediction.risk_score }}</span>
+                <span class="risk-max">/100</span>
+            </div>
+            <div class="risk-info">
+                <h3>Overall Health Risk</h3>
+                <p class="risk-level">{% if prediction.risk_score < 20 %}Low{% elif prediction.risk_score < 40 %}Moderate{% elif prediction.risk_score < 60 %}High{% else %}Very High{% endif %}</p>
+                <p class="risk-description">
+                    {% if prediction.risk_score < 20 %}
+                        Your blood pressure appears to be well-controlled. Continue monitoring and maintaining healthy habits.
+                    {% elif prediction.risk_score < 40 %}
+                        You have moderate risk factors. Focus on lifestyle modifications and regular monitoring.
+                    {% elif prediction.risk_score < 60 %}
+                        You have significant risk factors. Consult with your healthcare provider regularly.
+                    {% else %}
+                        You have very high risk factors. Immediate medical attention is recommended.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Metrics -->
+    <div class="detail-card metrics-card">
+        <h2>Health Indicators</h2>
+        <div class="metrics-grid">
+            <div class="metric-item">
+                <span class="metric-label">Blood Pressure (Systolic):</span>
+                <span class="metric-value">{{ prediction.systolic }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Blood Pressure (Diastolic):</span>
+                <span class="metric-value">{{ prediction.diastolic }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Age Group:</span>
+                <span class="metric-value">{{ prediction.age }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Gender:</span>
+                <span class="metric-value">{{ prediction.gender }}</span>
+            </div>
+            {% if prediction.heart_rate %}
+            <div class="metric-item">
+                <span class="metric-label">Heart Rate:</span>
+                <span class="metric-value">{{ prediction.heart_rate }} bpm</span>
+            </div>
+            {% endif %}
+            {% if prediction.height and prediction.weight %}
+            <div class="metric-item">
+                <span class="metric-label">BMI:</span>
+                <span class="metric-value">{{ "%.1f"|format(prediction.weight / ((prediction.height / 100) ** 2)) }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Medical History -->
+    <div class="detail-card history-card">
+        <h2>Medical History</h2>
+        <div class="history-grid">
+            <div class="history-item">
+                <span class="history-label">Hypertension History:</span>
+                <span class="history-value">{{ prediction.history }}</span>
+            </div>
+            <div class="history-item">
+                <span class="history-label">Currently Diagnosed:</span>
+                <span class="history-value">{{ prediction.patient }}</span>
+            </div>
+            <div class="history-item">
+                <span class="history-label">Taking Medication:</span>
+                <span class="history-value">{{ prediction.take_medication }}</span>
+            </div>
+            <div class="history-item">
+                <span class="history-label">Controlled Diet:</span>
+                <span class="history-value">{{ prediction.controlled_diet }}</span>
+            </div>
+            <div class="history-item">
+                <span class="history-label">Shortness of Breath:</span>
+                <span class="history-value">{{ prediction.breath_shortness }}</span>
+            </div>
+            <div class="history-item">
+                <span class="history-label">Vision Problems:</span>
+                <span class="history-value">{{ prediction.visual_changes }}</span>
+            </div>
+            <div class="history-item">
+                <span class="history-label">Nose Bleeding:</span>
+                <span class="history-value">{{ prediction.nose_bleeding }}</span>
+            </div>
+            <div class="history-item">
+                <span class="history-label">Diagnosis Duration:</span>
+                <span class="history-value">{{ prediction.whendiagnoused }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations -->
+    {% if recommendations %}
+    <div class="detail-card recommendations-card">
+        <h2>Personalized Recommendations</h2>
+        <ul class="recommendations-list">
+            {% for recommendation in recommendations %}
+            <li class="recommendation-item">
+                <span class="checkmark">✓</span>
+                {{ recommendation }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Notes -->
+    {% if prediction.notes %}
+    <div class="detail-card notes-card">
+        <h2>Additional Notes</h2>
+        <p class="notes-content">{{ prediction.notes }}</p>
+    </div>
+    {% endif %}
+
+    <div class="detail-footer">
+        <form method="POST" action="{{ url_for('delete_prediction', pred_id=prediction.id) }}" onsubmit="return confirm('Are you sure you want to delete this prediction?');">
+            <button type="submit" class="btn-delete-large">Delete This Prediction</button>
+        </form>
+    </div>
+</div>
+
+<style>
+.prediction-detail-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.btn-back {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.btn-back:hover {
+    color: #764ba2;
+}
+
+.detail-header h1 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.detail-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-export {
+    background: #27ae60;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-export:hover {
+    background: #229954;
+    transform: translateY(-2px);
+}
+
+.detail-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.detail-card h2 {
+    color: #2c3e50;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.5rem;
+}
+
+.result-card .stage-large {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    color: white;
+}
+
+.result-card .stage-normal {
+    background: #4CAF50;
+}
+
+.result-card .stage-1 {
+    background: #FF9800;
+}
+
+.result-card .stage-2 {
+    background: #FF6B47;
+}
+
+.result-card .stage-crisis {
+    background: #E53935;
+}
+
+.result-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.meta-label {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.meta-value {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.risk-score-display {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.risk-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.risk-circle[data-risk="0"], 
+.risk-circle[data-risk="1"],
+.risk-circle[data-risk="2"],
+.risk-circle[data-risk="3"],
+.risk-circle[data-risk="4"],
+.risk-circle[data-risk="5"],
+.risk-circle[data-risk="6"],
+.risk-circle[data-risk="7"],
+.risk-circle[data-risk="8"],
+.risk-circle[data-risk="9"],
+.risk-circle[data-risk="10"],
+.risk-circle[data-risk="11"],
+.risk-circle[data-risk="12"],
+.risk-circle[data-risk="13"],
+.risk-circle[data-risk="14"],
+.risk-circle[data-risk="15"],
+.risk-circle[data-risk="16"],
+.risk-circle[data-risk="17"],
+.risk-circle[data-risk="18"],
+.risk-circle[data-risk="19"] {
+    background: #4CAF50;
+}
+
+[data-risk*="2"][data-risk*="0"],
+[data-risk*="2"][data-risk*="1"],
+[data-risk*="2"][data-risk*="2"],
+[data-risk*="2"][data-risk*="3"],
+[data-risk*="2"][data-risk*="4"],
+[data-risk*="2"][data-risk*="5"],
+[data-risk*="2"][data-risk*="6"],
+[data-risk*="2"][data-risk*="7"],
+[data-risk*="2"][data-risk*="8"],
+[data-risk*="2"][data-risk*="9"],
+[data-risk*="3"][data-risk*="0"],
+[data-risk*="3"][data-risk*="1"],
+[data-risk*="3"][data-risk*="2"],
+[data-risk*="3"][data-risk*="3"],
+[data-risk*="3"][data-risk*="4"],
+[data-risk*="3"][data-risk*="5"],
+[data-risk*="3"][data-risk*="6"],
+[data-risk*="3"][data-risk*="7"],
+[data-risk*="3"][data-risk*="8"],
+[data-risk*="3"][data-risk*="9"] {
+    background: #FF9800;
+}
+
+[data-risk*="4"],
+[data-risk*="5"] {
+    background: #FF6B47;
+}
+
+[data-risk*="6"],
+[data-risk*="7"],
+[data-risk*="8"],
+[data-risk*="9"],
+[data-risk*="100"] {
+    background: #E53935;
+}
+
+.risk-number {
+    font-size: 2.5rem;
+}
+
+.risk-max {
+    font-size: 1rem;
+}
+
+.risk-info h3 {
+    color: #2c3e50;
+    margin: 0 0 0.5rem 0;
+}
+
+.risk-level {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #667eea;
+    margin: 0 0 0.5rem 0;
+}
+
+.risk-description {
+    color: #7f8c8d;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.metric-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-label {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.metric-value {
+    color: #2c3e50;
+    font-weight: 6 00;
+    font-size: 1.1rem;
+}
+
+.history-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.history-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 3px solid #667eea;
+}
+
+.history-label {
+    display: block;
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.history-value {
+    display: block;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.recommendations-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.recommendation-item {
+    background: #f0f8ff;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 3px solid #4CAF50;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    color: #2c3e50;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.checkmark {
+    color: #4CAF50;
+    font-weight: bold;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.notes-content {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    line-height: 1.6;
+    color: #34495e;
+    margin: 0;
+}
+
+.detail-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #ecf0f1;
+}
+
+.btn-delete-large {
+    background: #e74c3c;
+    color: white;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-delete-large:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .prediction-detail-container {
+        padding: 1rem;
+    }
+
+    .detail-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .detail-header h1 {
+        text-align: left;
+        font-size: 1.5rem;
+    }
+
+    .risk-score-display {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .detail-card {
+        padding: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
