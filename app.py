@@ -58,6 +58,16 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # Routes
+@app.route("/health")
+def health():
+    """Health check endpoint to verify database connection"""
+    try:
+        # Try a simple database query
+        db.session.execute(db.text("SELECT 1"))
+        return {"status": "healthy", "database": "connected"}, 200
+    except Exception as e:
+        logger.error(f"Health check failed: {e}", exc_info=True)
+        return {"status": "unhealthy", "database": "disconnected", "error": str(e)}, 500
 @app.route("/")
 @app.route("/home")
 def home():
@@ -86,8 +96,8 @@ def register():
             return redirect(url_for('login'))
         except Exception as e:
             db.session.rollback()
-            logger.error(f"Registration error: {e}")
-            flash('An error occurred during registration.', 'danger')
+            logger.error(f"Registration error: {e}", exc_info=True)
+            flash(f'Registration error: {str(e)}', 'danger')
     return render_template("register.html", title="Register", form=form)
 
 @app.route("/login", methods=["GET", "POST"])
@@ -129,8 +139,8 @@ def dashboard():
         predictions = Prediction.query.filter_by(user_id=current_user.id).order_by(Prediction.created_at.desc()).paginate(page=page, per_page=10)
         return render_template("dashboard.html", title="Dashboard", predictions=predictions)
     except Exception as e:
-        logger.error(f"Dashboard error: {e}")
-        flash('Error loading dashboard.', 'danger')
+        logger.error(f"Dashboard error: {e}", exc_info=True)
+        flash(f'Error loading dashboard: {str(e)}', 'danger')
         return redirect(url_for('home'))
 
 @app.route("/predict", methods=["GET", "POST"])
