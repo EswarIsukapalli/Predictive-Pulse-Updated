@@ -1,5 +1,5 @@
 pandas
-scikit-learn == 1.5.2
+scikit-learn==1.5.2
 feature-engine
 flask
 flask-wtf
@@ -10,4 +10,5 @@ gunicorn
 joblib==1.4.0
 reportlab
 werkzeug
-email-validator 
+email-validator
+psycopg2-binary

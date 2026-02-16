@@ -1,5 +1,6 @@
 import pandas as pd
 import joblib
+import os
 from flask import (
     Flask,
     url_for,
@@ -340,4 +341,4 @@ def internal_error(error):
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port=10000)
+    app.run(debug=False, host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
